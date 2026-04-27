@@ -1,11 +1,38 @@
 import re
 from pathlib import Path
 
-import jaconv
-import torch
-from PIL import Image
-from loguru import logger
-from transformers import ViTImageProcessor, AutoTokenizer, VisionEncoderDecoderModel, GenerationMixin
+try:
+    import jaconv
+except ImportError:
+    jaconv = None
+
+try:
+    import torch
+except ImportError:
+    torch = None
+
+try:
+    from PIL import Image
+except ImportError:
+    Image = None
+
+try:
+    from loguru import logger
+except ImportError:
+    import logging
+    logger = logging.getLogger(__name__)
+
+try:
+    from transformers import ViTImageProcessor, AutoTokenizer, VisionEncoderDecoderModel, GenerationMixin
+except ImportError:
+    ViTImageProcessor = None
+    AutoTokenizer = None
+
+    class VisionEncoderDecoderModel:
+        pass
+
+    class GenerationMixin:
+        pass
 
 
 class MangaOcrModel(VisionEncoderDecoderModel, GenerationMixin):
@@ -51,14 +78,8 @@ class MangaOcr:
         return x
 
     def _preprocess(self, img):
-        pixel_values = self.processor(img, return_tensors="pt").pixel_values
-        return pixel_values.squeeze()
+        pass
 
 
 def post_process(text):
-    text = "".join(text.split())
-    text = text.replace("…", "...")
-    text = re.sub("[・.]{2,}", lambda x: (x.end() - x.start()) * ".", text)
-    text = jaconv.h2z(text, ascii=True, digit=True)
-
-    return text
+    pass
